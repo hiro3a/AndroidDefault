@@ -5,6 +5,8 @@ import android.app.Application;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import timber.log.Timber;
+
 /**
  * アプリケーション。
  */
@@ -16,6 +18,13 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // Timber 対応
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
+
+        // シングルトン対応
         sInstance = this;
         try {
             Constructor<AndroidSingleton> constructor = AndroidSingleton.class.getDeclaredConstructor();
