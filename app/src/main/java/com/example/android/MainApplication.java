@@ -1,6 +1,7 @@
 package com.example.android;
 
 import android.app.Application;
+import android.os.StrictMode;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -18,6 +19,22 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        
+        // StrictMode 対応
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                    new StrictMode.ThreadPolicy.Builder()
+                            .detectAll()
+                            .penaltyLog()
+                            .penaltyDeath()
+                            .build());
+            StrictMode.setVmPolicy(
+                    new StrictMode.VmPolicy.Builder()
+                            .detectAll()
+                            .penaltyLog()
+                            .penaltyDeath()
+                            .build());
+        }
 
         // Timber 対応
         if (BuildConfig.DEBUG) {
