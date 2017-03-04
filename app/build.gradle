@@ -20,6 +20,35 @@ android {
     }
 }
 
+// Javadoc (http://qiita.com/k-yamada@github/items/fa77864b31919c0b765a)
+project.ext {
+    if (android.hasProperty('applicationVariants')) {
+        androidVariants = android.applicationVariants
+    }else if (android.hasProperty('libraryVariants')) {
+        androidVariants = android.libraryVariants
+    }
+}
+project.androidVariants.all { variant ->
+    task("javadoc", type: Javadoc, overwrite: true) {
+        title = "Android Default Application"
+        source = variant.javaCompile.source
+        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+
+        options {
+            links("http://docs.oracle.com/javase/jp/7/api/");
+            linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference")
+            setMemberLevel(JavadocMemberLevel.PROTECTED)
+            docEncoding = 'UTF-8'
+            encoding = 'UTF-8'
+            charSet = 'UTF-8'
+        }
+
+        exclude '**/BuildConfig.java'
+        exclude '**/R.java'
+    }
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
