@@ -8,8 +8,10 @@ import android.util.Log;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.CodeSignature;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -27,6 +29,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Aspect
 public class AspectLog {
+    private static final String TAG = "AspectLog";
 
     @Pointcut("execution(* *(..)) && !within(AspectLog) && !within(Strings)")
     public void method() {
@@ -50,30 +53,39 @@ public class AspectLog {
         return result;
     }
 
-    private static void enterMethod(JoinPoint joinPoint) {
+    //@Before("method() || constructor()")
+    public void enterMethod(JoinPoint joinPoint) {
         CodeSignature codeSignature = (CodeSignature) joinPoint.getSignature();
 
         Class<?> cls = codeSignature.getDeclaringType();
+        String fileName = joinPoint.getSourceLocation().getFileName();
+        String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = codeSignature.getName();
+        int lineNumber = joinPoint.getSourceLocation().getLine();
         String[] parameterNames = codeSignature.getParameterNames();
         Object[] parameterValues = joinPoint.getArgs();
 
         StringBuilder builder = new StringBuilder("\u21E2 ");
-        builder.append(methodName).append('(');
-        for (int i = 0; i < parameterValues.length; i++) {
-            if (i > 0) {
-                builder.append(", ");
+        builder.append(className).append('#').append(methodName);
+        builder.append('(').append(fileName).append(':').append(lineNumber).append(')');
+
+        if (0 < parameterValues.length) {
+            builder.append(" {");
+            for (int i = 0; i < parameterValues.length; i++) {
+                if (i > 0) {
+                    builder.append(", ");
+                }
+                builder.append(parameterNames[i]).append('=');
+                builder.append(Strings.toString(parameterValues[i]));
             }
-            builder.append(parameterNames[i]).append('=');
-            builder.append(Strings.toString(parameterValues[i]));
+            builder.append('}');
         }
-        builder.append(')');
 
         if (Looper.myLooper() != Looper.getMainLooper()) {
             builder.append(" [Thread:\"").append(Thread.currentThread().getName()).append("\"]");
         }
 
-        Log.v(asTag(cls), builder.toString());
+        Log.v(TAG, builder.toString());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             final String section = builder.toString().substring(2);
@@ -81,7 +93,34 @@ public class AspectLog {
         }
     }
 
-    private static void exitMethod(JoinPoint joinPoint, Object result, long lengthMillis) {
+    //@After("method() || constructor()")
+    public void exitMethod(JoinPoint joinPoint) throws Throwable {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            Trace.endSection();
+        }
+
+        CodeSignature codeSignature = (CodeSignature) joinPoint.getSignature();
+
+        String fileName = joinPoint.getSourceLocation().getFileName();
+        String className = joinPoint.getTarget().getClass().getSimpleName();
+        String methodName = codeSignature.getName();
+        int lineNumber = Thread.currentThread().getStackTrace()[3].getLineNumber();
+        boolean hasReturnType = codeSignature instanceof MethodSignature
+                && ((MethodSignature) codeSignature).getReturnType() != void.class;
+
+        StringBuilder builder = new StringBuilder("\u21E0 ");
+        builder.append(className).append('#').append(methodName);
+        builder.append('(').append(fileName).append(':').append(lineNumber).append(')');
+
+        if (hasReturnType) {
+            builder.append(" = ");
+            builder.append(((MethodSignature) codeSignature).getReturnType().getSimpleName());
+        }
+
+        Log.v(TAG, builder.toString());
+    }
+
+    private void exitMethod(JoinPoint joinPoint, Object result, long lengthMillis) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.endSection();
         }
@@ -89,28 +128,23 @@ public class AspectLog {
         Signature signature = joinPoint.getSignature();
 
         Class<?> cls = signature.getDeclaringType();
+        String fileName = joinPoint.getSourceLocation().getFileName();
+        String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = signature.getName();
+        int lineNumber = joinPoint.getSourceLocation().getLine();
         boolean hasReturnType = signature instanceof MethodSignature
                 && ((MethodSignature) signature).getReturnType() != void.class;
 
-        StringBuilder builder = new StringBuilder("\u21E0 ")
-                .append(methodName)
-                .append(" [")
-                .append(lengthMillis)
-                .append("ms]");
+        StringBuilder builder = new StringBuilder("\u21E0 ");
+        builder.append(className).append('#').append(methodName);
+        builder.append('(').append(fileName).append(':').append(lineNumber).append(')');
+        builder.append(" [").append(lengthMillis).append("ms]");
 
         if (hasReturnType) {
             builder.append(" = ");
             builder.append(Strings.toString(result));
         }
 
-        Log.v(asTag(cls), builder.toString());
-    }
-
-    private static String asTag(Class<?> cls) {
-        if (cls.isAnonymousClass()) {
-            return asTag(cls.getEnclosingClass());
-        }
-        return cls.getSimpleName();
+        Log.v(TAG, builder.toString());
     }
 }
