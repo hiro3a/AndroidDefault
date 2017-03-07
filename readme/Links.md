@@ -15,6 +15,11 @@
 * [Android Studio最速入門～効率的にコーディングするための使い方](http://gihyo.jp/dev/serial/01/android_studio)
 * [Android Studio / IntelliJ IDEA の日本語化と設定](http://qiita.com/cypher256/items/a87179fbe8dd7f63ec4e)
 
+# コーディング規約
+* [Code Style for Contributors](https://source.android.com/source/code-style.html)
+* [コントリビュータのためのAndroidコードスタイルガイドライン 日本語訳](http://www.textdrop.net/android/code-style-ja.html)
+* [Qiita:Various Android Coding Style2016](http://qiita.com/Reyurnible/items/c2c0f7150d338a49de86)
+
 # Material Design
 * [Material Design Color Palette Generator](https://www.materialpalette.com/)
 
