@@ -14,7 +14,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -24,7 +24,7 @@ android {
 project.ext {
     if (android.hasProperty('applicationVariants')) {
         androidVariants = android.applicationVariants
-    }else if (android.hasProperty('libraryVariants')) {
+    } else if (android.hasProperty('libraryVariants')) {
         androidVariants = android.libraryVariants
     }
 }
