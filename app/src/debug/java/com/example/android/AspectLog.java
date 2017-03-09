@@ -6,17 +6,14 @@ import android.os.Trace;
 import android.util.Log;
 
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.CodeSignature;
 import org.aspectj.lang.reflect.MethodSignature;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * AspectJ を用いたログ出力クラス。
@@ -27,11 +24,12 @@ import java.util.concurrent.TimeUnit;
  * @see <a href="https://hondou.homedns.org/pukiwiki/pukiwiki.php?AspectJ%20%A5%ED%A5%B0">AspectJ ログ</a>
  * @see <a href="https://www.slideshare.net/minoruchikamune/aspectjjava-20120907">AspectJによるJava言語拡張 2012.09.07</a>
  */
+@SuppressWarnings("unused")
 @Aspect
 public class AspectLog {
     private static final String TAG = "AspectLog";
 
-    @Pointcut("execution(* *(..)) && !within(AspectLog) && !within(Strings)")
+    @Pointcut("execution(* *(..)) && !execution(* set*(..)) && !execution(* get*(..)) && !execution(* toString(..)) && !within(AspectLog) && !within(Strings)")
     public void method() {
     }
 
@@ -39,27 +37,18 @@ public class AspectLog {
     public void constructor() {
     }
 
-    @Around("method() || constructor()")
-    public Object logAndExecute(ProceedingJoinPoint joinPoint) throws Throwable {
-        enterMethod(joinPoint);
 
-        long startNanos = System.nanoTime();
-        Object result = joinPoint.proceed();
-        long stopNanos = System.nanoTime();
-        long lengthMillis = TimeUnit.NANOSECONDS.toMillis(stopNanos - startNanos);
-
-        exitMethod(joinPoint, result, lengthMillis);
-
-        return result;
-    }
-
-    //@Before("method() || constructor()")
-    public void enterMethod(JoinPoint joinPoint) {
+    /**
+     * メソッド呼び出し時のログ出力。
+     * @param joinPoint ジョインポイント
+     */
+    @Before("method() || constructor()")
+    public void beforeMethod(JoinPoint joinPoint) {
         CodeSignature codeSignature = (CodeSignature) joinPoint.getSignature();
 
         Class<?> cls = codeSignature.getDeclaringType();
         String fileName = joinPoint.getSourceLocation().getFileName();
-        String className = joinPoint.getTarget().getClass().getSimpleName();
+        String className = getClassName(cls);
         String methodName = codeSignature.getName();
         int lineNumber = joinPoint.getSourceLocation().getLine();
         String[] parameterNames = codeSignature.getParameterNames();
@@ -93,34 +82,13 @@ public class AspectLog {
         }
     }
 
-    //@After("method() || constructor()")
-    public void exitMethod(JoinPoint joinPoint) throws Throwable {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            Trace.endSection();
-        }
-
-        CodeSignature codeSignature = (CodeSignature) joinPoint.getSignature();
-
-        String fileName = joinPoint.getSourceLocation().getFileName();
-        String className = joinPoint.getTarget().getClass().getSimpleName();
-        String methodName = codeSignature.getName();
-        int lineNumber = Thread.currentThread().getStackTrace()[3].getLineNumber();
-        boolean hasReturnType = codeSignature instanceof MethodSignature
-                && ((MethodSignature) codeSignature).getReturnType() != void.class;
-
-        StringBuilder builder = new StringBuilder("\u21E0 ");
-        builder.append(className).append('#').append(methodName);
-        builder.append('(').append(fileName).append(':').append(lineNumber).append(')');
-
-        if (hasReturnType) {
-            builder.append(" = ");
-            builder.append(((MethodSignature) codeSignature).getReturnType().getSimpleName());
-        }
-
-        Log.v(TAG, builder.toString());
-    }
-
-    private void exitMethod(JoinPoint joinPoint, Object result, long lengthMillis) {
+    /**
+     * メソッドの実行が正常終了したときのログ出力。
+     * @param joinPoint ジョインポイント
+     * @param result 戻り値
+     */
+    @AfterReturning(pointcut = "method() || constructor()", returning = "result")
+    public void afterReturning(JoinPoint joinPoint, Object result) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.endSection();
         }
@@ -129,16 +97,15 @@ public class AspectLog {
 
         Class<?> cls = signature.getDeclaringType();
         String fileName = joinPoint.getSourceLocation().getFileName();
-        String className = joinPoint.getTarget().getClass().getSimpleName();
+        String className = getClassName(cls);
         String methodName = signature.getName();
-        int lineNumber = joinPoint.getSourceLocation().getLine();
+        int lineNumber = getLineNumber();
         boolean hasReturnType = signature instanceof MethodSignature
                 && ((MethodSignature) signature).getReturnType() != void.class;
 
         StringBuilder builder = new StringBuilder("\u21E0 ");
         builder.append(className).append('#').append(methodName);
         builder.append('(').append(fileName).append(':').append(lineNumber).append(')');
-        builder.append(" [").append(lengthMillis).append("ms]");
 
         if (hasReturnType) {
             builder.append(" = ");
@@ -146,5 +113,76 @@ public class AspectLog {
         }
 
         Log.v(TAG, builder.toString());
+    }
+
+    /**
+     * 例外が発生したときのログ出力。
+     * @param joinPoint ジョインポイント
+     * @param exception 例外
+     */
+    @AfterThrowing(pointcut = "method() || constructor()", throwing = "exception")
+    public void afterThrowing(JoinPoint joinPoint, Exception exception) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            Trace.endSection();
+        }
+
+        Signature signature = joinPoint.getSignature();
+
+        Class<?> cls = signature.getDeclaringType();
+        String fileName = joinPoint.getSourceLocation().getFileName();
+        String className = getClassName(cls);
+        String methodName = signature.getName();
+        int lineNumber = getLineNumber(exception);
+        String exceptionName = exception.getClass().getName();
+
+        StringBuilder builder = new StringBuilder("\u21E0 ");
+        builder.append(className).append('#').append(methodName);
+        builder.append('(').append(fileName).append(':').append(lineNumber).append(')');
+        builder.append(" [").append(exceptionName).append(']');
+
+        Log.e(TAG, builder.toString());
+    }
+
+    /**
+     * ログ出力用のクラス名を得ます。
+     * @param cls 対象のクラス
+     * @return クラス名
+     */
+    private static String getClassName(Class<?> cls) {
+        if (cls.isAnonymousClass()) {
+            return getClassName(cls.getEnclosingClass());
+        }
+        return cls.getSimpleName();
+    }
+
+    /**
+     * 対象のポイントカットが呼び出されたタイミングのソースコードの行番号を得ます。
+     * @return 行番号
+     */
+    private static int getLineNumber() {
+        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+        int lineNumber = elements[4].getLineNumber();
+        return lineNumber;
+    }
+
+    /**
+     * {@code Exception} のスタックトレースから、対象のポイントカットが呼び出されたタイミングのソースコードの行番号を得ます。
+     * @param exception 例外
+     * @return 行番号
+     */
+    private static int getLineNumber(Exception exception) {
+        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+        String fileName = elements[4].getFileName();
+        String className = elements[4].getClassName();
+        String methodName = elements[4].getMethodName();
+        int lineNumber = elements[4].getLineNumber();
+        for (StackTraceElement element : exception.getStackTrace()) {
+            if (fileName.equals(element.getFileName()) &&
+                    className.equals(element.getClassName()) &&
+                    methodName.equals(element.getMethodName())) {
+                lineNumber = element.getLineNumber();
+            }
+        }
+        return lineNumber;
     }
 }
