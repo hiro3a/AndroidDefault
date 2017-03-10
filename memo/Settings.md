@@ -12,6 +12,8 @@
 ## General
 * Other
   * Show quick documentation on mouse move : ON
+* Rich-text copy
+  * Copy as rich text by default : OFF
 
 ### Auto Import
 * Java
