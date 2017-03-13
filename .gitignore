@@ -40,22 +40,23 @@ captures/
 .idea/libraries
 .idea/workspace.xml
 .idea/tasks.xml
-.idea/gradle.xml
+.idea/compiler.xml
+.idea/modules.xml
 .idea/**/*.xml
 
 # IntelliJ (keep)
 !.idea/codeStyleSettings.xml
 !.idea/copyright/*.xml
 !.idea/fileColors.xml
+!.idea/fileTemplates/*.xml
 !.idea/encodings.xml
 !.idea/gradle.xml
 !.idea/runConfigurations/*.xml
-!.idea/inspectionProfiles/*.xml
-.idea/inspectionProfiles/profiles_settings.xml
-!.idea/scopes/*.xml
-.idea/scopes/scope_settings.xml
+!.idea/inspectionProfiles/profiles_settings.xml
+!.idea/scopes/scope_settings.xml
 !.idea/templateLanguages.xml
 !.idea/vcs.xml
+!.idea/saveactions_settings.xml
 
 # Keystore files
 *.jks
@@ -71,7 +72,11 @@ freeline.py
 freeline/
 freeline_project_description.json
 
-# Windows thumbnail db
+# OS-specific files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
-
