@@ -132,7 +132,7 @@ public class AspectLog {
         String fileName = joinPoint.getSourceLocation().getFileName();
         String className = getClassName(cls);
         String methodName = signature.getName();
-        int lineNumber = getLineNumber(exception);
+        int lineNumber = getLineNumber(joinPoint, exception);
         String exceptionName = exception.getClass().getName();
 
         StringBuilder builder = new StringBuilder("\u21E0 ");
@@ -167,22 +167,28 @@ public class AspectLog {
 
     /**
      * {@code Exception} のスタックトレースから、対象のポイントカットが呼び出されたタイミングのソースコードの行番号を得ます。
+     * @param joinPoint ジョインポイント
      * @param exception 例外
      * @return 行番号
      */
-    private static int getLineNumber(Exception exception) {
-        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-        String fileName = elements[4].getFileName();
-        String className = elements[4].getClassName();
-        String methodName = elements[4].getMethodName();
-        int lineNumber = elements[4].getLineNumber();
-        for (StackTraceElement element : exception.getStackTrace()) {
-            if (fileName.equals(element.getFileName()) &&
-                    className.equals(element.getClassName()) &&
-                    methodName.equals(element.getMethodName())) {
-                lineNumber = element.getLineNumber();
+    private static int getLineNumber(JoinPoint joinPoint, Exception exception) {
+        StackTraceElement element = Thread.currentThread().getStackTrace()[4];
+        String fileName = element.getFileName();
+        String className = element.getClassName();
+        String methodName = element.getMethodName();
+        int topLineNumber = joinPoint.getSourceLocation().getLine();
+        int endLineNumber = element.getLineNumber();
+
+        for (StackTraceElement trace : exception.getStackTrace()) {
+            int lineNumber = trace.getLineNumber();
+            if (fileName.equals(trace.getFileName()) &&
+                    className.equals(trace.getClassName()) &&
+                    methodName.equals(trace.getMethodName()) &&
+                    topLineNumber < trace.getLineNumber() &&
+                    trace.getLineNumber() <= endLineNumber) {
+                return lineNumber;
             }
         }
-        return lineNumber;
+        return endLineNumber;
     }
 }
