@@ -46,6 +46,7 @@ captures/
 
 # IntelliJ (keep)
 !.idea/codeStyleSettings.xml
+!.idea/runConfigurations.xml
 !.idea/copyright/*.xml
 !.idea/fileColors.xml
 !.idea/fileTemplates/*.xml
