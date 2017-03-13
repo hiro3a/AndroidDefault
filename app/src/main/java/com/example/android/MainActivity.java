@@ -38,36 +38,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        test();
-
-        int i = 1;
-        i++;
-        i++;
-        i++;
-        i++;
-        i++;
-        i++;
-        i++;
-        i++;
-    }
-
-    private void test(int i) {
-        throw new UnsupportedOperationException("test");
-    }
-
-    private void test() {
-        test(123);
-
-        int i = 1;
-        i++;
-        i++;
-        i++;
-        i++;
-        i++;
-        i++;
-        i++;
-        i++;
     }
 
     @Override
