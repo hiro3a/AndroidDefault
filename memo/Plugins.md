@@ -16,5 +16,9 @@
 ### Javadoc
 * [JavaDoc](https://plugins.jetbrains.com/plugin/7157-javadoc)
 
+### UML
+<pre>$ brew install graphviz</pre>
+* [PlantUML integration](https://plugins.jetbrains.com/plugin/7017-plantuml-integration)
+
 ### ショートカット表示
-[Presentation Assistant](https://plugins.jetbrains.com/plugin/7345-presentation-assistant)
+* [Presentation Assistant](https://plugins.jetbrains.com/plugin/7345-presentation-assistant)
