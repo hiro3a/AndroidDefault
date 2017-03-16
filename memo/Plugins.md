@@ -17,7 +17,7 @@
 * [JavaDoc](https://plugins.jetbrains.com/plugin/7157-javadoc)
 
 ### UML
-<pre>$ brew install graphviz</pre>
+* [Graphviz](http://www.graphviz.org/) をインストールしておく
 * [PlantUML integration](https://plugins.jetbrains.com/plugin/7017-plantuml-integration)
 
 ### ショートカット表示

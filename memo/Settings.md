@@ -69,7 +69,8 @@
 * Project Encoding : UTF-8
 * Default encoding for properties files : UTF-8
 
-# Save Actions
+# Other Settings
+## Save Actions
 * Formatting actions
   * Organize imports : ON
   * Reformat file : ON
