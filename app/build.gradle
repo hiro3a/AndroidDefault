@@ -2,6 +2,10 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.uphyca.android-aspectj'
 
 android {
+    // signingConfigs
+    apply from: '../keystore/debug.gradle', to: android
+    apply from: '../keystore/release.gradle', to: android
+
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
@@ -13,9 +17,14 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            debuggable true
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }
