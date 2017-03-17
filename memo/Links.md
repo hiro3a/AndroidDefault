@@ -5,6 +5,9 @@
 * [Android Open Source Project](http://source.android.com/index.html)
 * [Factory Images for Nexus and Pixel Devices](https://developers.google.com/android/images)
 
+# Sample Code
+* [Platform engineering tools, sample code](https://android.googlesource.com/platform/development)
+
 # Reference
 * [Android Platform](https://developer.android.com/reference/packages.html)
 * [Google APIs for Android](https://developers.google.com/android/reference/packages)
