@@ -54,7 +54,6 @@ captures/
 !.idea/gradle.xml
 !.idea/runConfigurations/*.xml
 !.idea/inspectionProfiles/*.xml
-.idea/inspectionProfiles/profiles_settings.xml
 !.idea/scopes/*.xml
 .idea/scopes/scope_settings.xml
 !.idea/templateLanguages.xml
