@@ -53,8 +53,10 @@ captures/
 !.idea/encodings.xml
 !.idea/gradle.xml
 !.idea/runConfigurations/*.xml
-!.idea/inspectionProfiles/profiles_settings.xml
-!.idea/scopes/scope_settings.xml
+!.idea/inspectionProfiles/*.xml
+.idea/inspectionProfiles/profiles_settings.xml
+!.idea/scopes/*.xml
+.idea/scopes/scope_settings.xml
 !.idea/templateLanguages.xml
 !.idea/vcs.xml
 !.idea/saveactions_settings.xml

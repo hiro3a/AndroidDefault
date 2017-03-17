@@ -1,26 +1,28 @@
-# Appearance & Behavior
-## Appearance
+## 注
+* インスペクション&コードスタイルの定義は以下を利用する
+  * https://android.googlesource.com/platform/development/+/master/ide/intellij/
+
+## Appearance & Behavior > Appearance
 * Window Options
   * Show memory indicator : ON
 
-## System Settings
+## Appearance & Behavior > System Settings
 * Startup/Shutdown
   * Reopen last project on startup : OFF
   * Confirm application exit : ON
 
-# Editor
-## General
+## Editor > General
 * Other
   * Show quick documentation on mouse move : ON
 * Rich-text copy
   * Copy as rich text by default : OFF
 
-### Auto Import
+## Editor > General > Auto Import
 * Java
   * Optimize imports on the fly : 要検討
   * Add unambiguous imports on the fly : ON
 
-### Appearance
+## Editor > General > Appearance
 * Show line numbers : ON
 * Show method separators : ON
 * Show whitespaces : ON
@@ -28,17 +30,17 @@
   * Inner : ON
   * Trailing : ON
 
-### Code Completion
+## Editor > General > Code Completion
 * Case sensitive completion : None
 
-### Code Folding
+## Editor > General > Code Folding
 * One-line methods : OFF
 
-## Code Style
+## Editor > Code Style
 * Default Options
   * Right margin (columns) : 160
 
-### Java
+## Editor > Code Style > Java
 * JavaDoc
   * Alignment
     * Align parameter descriptions : OFF
@@ -60,17 +62,16 @@
     * Field - Name prefix : m
     * Static field - Name prefix : s
 
-### XML
+## Editor > Code Style > XML
 * Android
   * Use custom formatting settings for Android XML files : ON
 
-## File Encodings
+## Editor > File Encodings
 * IDE Encoding : UTF-8
 * Project Encoding : UTF-8
 * Default encoding for properties files : UTF-8
 
-# Other Settings
-## Save Actions
+## Other Settings > Save Actions
 * Formatting actions
   * Organize imports : ON
   * Reformat file : ON
