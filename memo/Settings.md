@@ -38,7 +38,7 @@
 
 ## Editor > Code Style
 * Default Options
-  * Right margin (columns) : 160
+  * Right margin (columns) : 100
 
 ## Editor > Code Style > Java
 * JavaDoc
